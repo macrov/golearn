@@ -13,7 +13,7 @@ func main() {
 
 	// API routes
 	mux.HandleFunc("/api/courses", coursesHandler)
-	mux.HandleFunc("/api/courses/", courseByIDHandler)
+	mux.HandleFunc("/api/courses/", courseOrLessonHandler)
 
 	// Static file serving
 	mux.HandleFunc("/", staticFileHandler)
@@ -69,26 +69,51 @@ func coursesHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(courses)
 }
 
-// courseByIDHandler handles GET /api/courses/:id
-func courseByIDHandler(w http.ResponseWriter, r *http.Request) {
+// courseOrLessonHandler handles GET /api/courses/:id and /api/courses/:id/lessons/:lessonId
+func courseOrLessonHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	// Extract ID from path
-	id := strings.TrimPrefix(r.URL.Path, "/api/courses/")
-	if id == "" {
-		http.Error(w, "Course ID required", http.StatusBadRequest)
+	// Extract path parts
+	path := strings.TrimPrefix(r.URL.Path, "/api/courses/")
+	parts := strings.Split(path, "/")
+
+	// /api/courses/:id
+	if len(parts) == 1 {
+		id := parts[0]
+		if id == "" {
+			http.Error(w, "Course ID required", http.StatusBadRequest)
+			return
+		}
+
+		course, found := getCourseDetail(id)
+		if !found {
+			http.Error(w, "Course not found", http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(course)
 		return
 	}
 
-	course, found := getCourseByID(id)
-	if !found {
-		http.Error(w, "Course not found", http.StatusNotFound)
+	// /api/courses/:id/lessons/:lessonId
+	if len(parts) == 3 && parts[1] == "lessons" {
+		courseID := parts[0]
+		lessonID := parts[2]
+
+		lesson, found := getLessonByID(courseID, lessonID)
+		if !found {
+			http.Error(w, "Lesson not found", http.StatusNotFound)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(lesson)
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(course)
+	http.Error(w, "Invalid path", http.StatusNotFound)
 }

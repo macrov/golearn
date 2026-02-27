@@ -1,0 +1,67 @@
+{
+  "id": "go-functions",
+  "title": "Go 函数进阶",
+  "description": "深入学习 Go 语言的函数特性",
+  "instructor": "李四",
+  "duration": 10,
+  "level": "intermediate",
+  "category": "programming",
+  "lessons": [
+    {
+      "id": "multiple-returns",
+      "title": "多返回值",
+      "description": "学习 Go 特有的多返回值特性",
+      "order": 1,
+      "content": "# 多返回值\n\nGo 允许函数返回多个值，这是非常强大的特性：\n\n```go\nfunc divmod(a, b int) (int, int) {\n    quotient := a / b\n    remainder := a % b\n    return quotient, remainder\n}\n\nq, r := divmod(10, 3)\nfmt.Println(q, r)  // 输出: 3 1\n```\n\n## 命名返回值\n\n```go\nfunc calculate(a, b int) (sum int, product int) {\n    sum = a + b\n    product = a * b\n    return  // 隐式返回\n}",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc divmod(a, b int) (int, int) {\n    quotient := a / b\n    remainder := a % b\n    return quotient, remainder\n}\n\nfunc main() {\n    q, r := divmod(10, 3)\n    fmt.Printf(\"10 除以 3 = %d 余 %d\\n\", q, r)\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "10 除以 3 = 3 余 1"
+        }
+      ]
+    },
+    {
+      "id": "variadic-functions",
+      "title": "可变参数函数",
+      "description": "接受任意数量参数的函数",
+      "order": 2,
+      "content": "# 可变参数函数\n\n使用 `...` 表示可变参数：\n\n```go\nfunc sum(numbers ...int) int {\n    total := 0\n    for _, num := range numbers {\n        total += num\n    }\n    return total\n}\n\nsum(1, 2, 3)     // 6\nsum(1, 2, 3, 4, 5)  // 15\n```\n\n## 展开切片\n\n```go\nnums := []int{1, 2, 3}\nsum(nums...)  // 展开切片作为参数\n```",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc sum(numbers ...int) int {\n    total := 0\n    for _, num := range numbers {\n        total += num\n    }\n    return total\n}\n\nfunc main() {\n    result := sum(1, 2, 3, 4, 5)\n    fmt.Printf(\"总和: %d\\n\", result)\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "总和: 15"
+        }
+      ]
+    },
+    {
+      "id": "closures",
+      "title": "闭包",
+      "description": "理解 Go 中的闭包和匿名函数",
+      "order": 3,
+      "content": "# 闭包\n\n闭包是可以访问其外部作用域变量的函数：\n\n```go\nfunc makeAdder(x int) func(int) int {\n    return func(y int) int {\n        return x + y\n    }\n}\n\nadd5 := makeAdder(5)\nadd5(3)  // 返回 8\n```\n\n## 匿名函数\n\n```go\nfunc main() {\n    add := func(a, b int) int {\n        return a + b\n    }\n    fmt.Println(add(1, 2))\n}",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc makeCounter() func() int {\n    count := 0\n    return func() int {\n        count++\n        return count\n    }\n}\n\nfunc main() {\n    counter := makeCounter()\n    fmt.Println(counter())\n    fmt.Println(counter())\n    fmt.Println(counter())\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "1\n2\n3"
+        }
+      ]
+    },
+    {
+      "id": "defer",
+      "title": "Defer 语句",
+      "description": "延迟执行函数调用",
+      "order": 4,
+      "content": "# Defer\n\ndefer 将函数调用推迟到函数返回前执行：\n\n```go\nfunc main() {\n    defer fmt.Println(\"最后\")\n    fmt.Println(\"首先\")\n}\n// 输出:\n// 首先\n// 最后\n```\n\n## 常见用途\n\n```go\nfile, _ := os.Open(\"file.txt\")\ndefer file.Close()  // 确保文件被关闭\n```",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    defer fmt.Println(\"第三\")\n    defer fmt.Println(\"第二\")\n    fmt.Println(\"第一\")\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "第一\n第二\n第三"
+        }
+      ]
+    }
+  ]
+}

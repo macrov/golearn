@@ -1,0 +1,81 @@
+{
+  "id": "go-basics",
+  "title": "Go 编程基础",
+  "description": "学习 Go 语言的核心概念，包括变量、类型、函数和控制流",
+  "instructor": "张三",
+  "duration": 12,
+  "level": "beginner",
+  "category": "programming",
+  "lessons": [
+    {
+      "id": "hello-world",
+      "title": "Hello World",
+      "description": "编写你的第一个 Go 程序",
+      "order": 1,
+      "content": "# Hello World\n\n欢迎来到 Go 语言的世界！让我们从最简单的程序开始。\n\n```go\npackage main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, World!\")\n}\n```\n\n## 代码解析\n\n- `package main`：声明这是一个可执行程序的入口包\n- `import \"fmt\"`：导入格式化输入输出包\n- `func main()`：程序的主入口函数\n- `fmt.Println`：打印一行文本并换行",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    fmt.Println(\"Hello, World!\")\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "Hello, World!"
+        }
+      ]
+    },
+    {
+      "id": "variables",
+      "title": "变量",
+      "description": "学习如何声明和使用变量",
+      "order": 2,
+      "content": "# 变量\n\n在 Go 中，有多种方式声明变量：\n\n## 使用 var 声明\n\n```go\nvar name string = \"Go\"\nvar age int = 15\n```\n\n## 类型推断\n\n```go\nvar language = \"Go\"  // 自动推断为 string\n```\n\n## 短变量声明（最常用）\n\n```go\nx := 10\ny := \"Hello\"\n```",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    // 声明一个字符串变量\n    var greeting string = \"Hello\"\n    \n    // 使用短变量声明\n    name := \"Go\"\n    \n    fmt.Println(greeting + \", \" + name + \"!\")\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "Hello, Go!"
+        }
+      ]
+    },
+    {
+      "id": "functions",
+      "title": "函数",
+      "description": "定义和调用函数",
+      "order": 3,
+      "content": "# 函数\n\n函数是 Go 的基本构建块：\n\n## 基本语法\n\n```go\nfunc functionName(parameter type) returnType {\n    // 函数体\n    return value\n}\n```\n\n## 多返回值\n\nGo 特有的特性：\n\n```go\nfunc divide(a, b int) (int, error) {\n    if b == 0 {\n        return 0, errors.New(\"division by zero\")\n    }\n    return a / b, nil\n}\n```",
+      "code": "package main\n\nimport \"fmt\"\n\n// 简单函数\nfunc greet(name string) string {\n    return \"Hello, \" + name + \"!\"\n}\n\nfunc main() {\n    message := greet(\"Go\")\n    fmt.Println(message)\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "Hello, Go!"
+        }
+      ]
+    },
+    {
+      "id": "if-else",
+      "title": "条件判断",
+      "description": "使用 if/else 进行条件判断",
+      "order": 4,
+      "content": "# If/Else 条件判断\n\nGo 的 if 语句不需要括号：\n\n```go\nif x > 10 {\n    fmt.Println(\"x is greater than 10\")\n} else if x < 10 {\n    fmt.Println(\"x is less than 10\")\n} else {\n    fmt.Println(\"x equals 10\")\n}\n```\n\n## 带初始化语句的 if\n\n```go\nif err := doSomething(); err != nil {\n    log.Fatal(err)\n}\n```",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    score := 85\n    \n    if score >= 90 {\n        fmt.Println(\"优秀\")\n    } else if score >= 60 {\n        fmt.Println(\"及格\")\n    } else {\n        fmt.Println(\"不及格\")\n    }\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "及格"
+        }
+      ]
+    },
+    {
+      "id": "loops",
+      "title": "循环",
+      "description": "Go 中唯一的循环语句：for",
+      "order": 5,
+      "content": "# For 循环\n\nGo 只有一种循环：for，但它有多种形式：\n\n## 标准形式\n\n```go\nfor i := 0; i < 5; i++ {\n    fmt.Println(i)\n}\n```\n\n## 当作 while 使用\n\n```go\nfor condition {\n    // 循环体\n}\n```\n\n## 无限循环\n\n```go\nfor {\n    // 永远执行，除非 break\n}\n```\n\n## 遍历集合\n\n```go\nnumbers := []int{1, 2, 3}\nfor i, num := range numbers {\n    fmt.Printf(\"索引 %d: %d\\n\", i, num)\n}",
+      "code": "package main\n\nimport \"fmt\"\n\nfunc main() {\n    // 打印 1 到 5\n    for i := 1; i <= 5; i++ {\n        fmt.Println(i)\n    }\n}",
+      "test_cases": [
+        {
+          "input": "",
+          "expected_output": "1\n2\n3\n4\n5"
+        }
+      ]
+    }
+  ]
+}
