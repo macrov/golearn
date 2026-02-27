@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './Playground.css';
 
 // Predefined code examples
@@ -47,12 +47,23 @@ func main() {
   }
 };
 
-export function Playground() {
+interface PlaygroundProps {
+  initialCode?: string;
+}
+
+export function Playground({ initialCode }: PlaygroundProps) {
   const [selectedExample, setSelectedExample] = useState('hello');
-  const [code, setCode] = useState(examples.hello.code);
+  const [code, setCode] = useState(initialCode || examples.hello.code);
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState('');
+
+  // Sync initialCode changes
+  useEffect(() => {
+    if (initialCode) {
+      setCode(initialCode);
+    }
+  }, [initialCode]);
 
   const handleExampleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const example = e.target.value;

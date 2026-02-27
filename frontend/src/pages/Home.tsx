@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Course } from '../types/course';
+import type { Course } from '../types/course';
 import { coursesApi } from '../api/courses';
 
 const getLevelBadge = (level: Course['level']) => {
