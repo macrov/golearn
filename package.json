@@ -1,0 +1,9 @@
+{
+  "name": "golearn",
+  "private": true,
+  "scripts": {
+    "dev": "cd frontend && npm run dev",
+    "server": "cd backend && go run main.go",
+    "dev:full": "cd frontend && npm run dev:full"
+  }
+}
