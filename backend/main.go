@@ -21,7 +21,7 @@ func main() {
 	// Wrap with CORS middleware
 	handler := corsMiddleware(mux)
 
-	addr := ":8080"
+	addr := ":8081"
 	log.Printf("Server starting on %s", addr)
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)

@@ -6,6 +6,7 @@ export interface Course {
   duration: number;
   level: 'beginner' | 'intermediate' | 'advanced';
   category: string;
+  lessons_count: number;
   created_at: string;
   updated_at: string;
 }

@@ -16,6 +16,7 @@ type Course struct {
 	Duration    int       `json:"duration"`
 	Level       string    `json:"level"`
 	Category    string    `json:"category"`
+	LessonsCount int      `json:"lessons_count"`
 	CreatedAt   time.Time `json:"created_at"`
 	UpdatedAt   time.Time `json:"updated_at"`
 }
@@ -63,7 +64,7 @@ func loadCourses() []Course {
 		return coursesCache
 	}
 
-	coursesDir := "./backend/data/courses"
+	coursesDir := "./data/courses"
 	entries, err := os.ReadDir(coursesDir)
 	if err != nil {
 		return []Course{}
@@ -87,15 +88,16 @@ func loadCourses() []Course {
 		}
 
 		courses = append(courses, Course{
-			ID:          cd.ID,
-			Title:       cd.Title,
-			Description: cd.Description,
-			Instructor:  cd.Instructor,
-			Duration:    cd.Duration,
-			Level:       cd.Level,
-			Category:    cd.Category,
-			CreatedAt:   time.Now(),
-			UpdatedAt:   time.Now(),
+			ID:           cd.ID,
+			Title:        cd.Title,
+			Description:  cd.Description,
+			Instructor:   cd.Instructor,
+			Duration:     cd.Duration,
+			Level:        cd.Level,
+			Category:     cd.Category,
+			LessonsCount: len(cd.Lessons),
+			CreatedAt:    time.Now(),
+			UpdatedAt:    time.Now(),
 		})
 	}
 
@@ -121,7 +123,7 @@ func getCourseByID(id string) (Course, bool) {
 
 // getCourseDetail returns a course with its lessons
 func getCourseDetail(id string) (CourseDetail, bool) {
-	coursesDir := "./backend/data/courses"
+	coursesDir := "./data/courses"
 	entries, err := os.ReadDir(coursesDir)
 	if err != nil {
 		return CourseDetail{}, false
@@ -146,15 +148,16 @@ func getCourseDetail(id string) (CourseDetail, bool) {
 		if cd.ID == id {
 			return CourseDetail{
 				Course: Course{
-					ID:          cd.ID,
-					Title:       cd.Title,
-					Description: cd.Description,
-					Instructor:  cd.Instructor,
-					Duration:    cd.Duration,
-					Level:       cd.Level,
-					Category:    cd.Category,
-					CreatedAt:   time.Now(),
-					UpdatedAt:   time.Now(),
+					ID:           cd.ID,
+					Title:        cd.Title,
+					Description:  cd.Description,
+					Instructor:   cd.Instructor,
+					Duration:     cd.Duration,
+					Level:        cd.Level,
+					Category:     cd.Category,
+					LessonsCount: len(cd.Lessons),
+					CreatedAt:    time.Now(),
+					UpdatedAt:    time.Now(),
 				},
 				Lessons: cd.Lessons,
 			}, true

@@ -1,6 +1,6 @@
 import { Course } from '../types/course';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8081/api';
 
 export const coursesApi = {
   getAll: async (): Promise<Course[]> => {

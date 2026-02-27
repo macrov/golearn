@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "dev": "cd frontend && npm run dev",
-    "server": "cd backend && go run main.go",
+    "server": "cd backend && /usr/local/go/bin/go run .",
     "dev:full": "cd frontend && npm run dev:full"
   }
 }
