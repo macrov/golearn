@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Course } from '../types/course';
 import { coursesApi } from '../api/courses';
+import { Playground } from '../components/Playground';
 
 export function Course() {
   const { id } = useParams<{ id: string }>();
@@ -41,6 +42,12 @@ export function Course() {
           </span>
         </div>
         <p className="text-gray-700 text-lg leading-relaxed">{course.description}</p>
+
+        <div className="mt-8">
+          <h2 className="text-2xl font-semibold mb-4">Practice Playground</h2>
+          <Playground />
+        </div>
+
         <div className="mt-8 pt-6 border-t">
           <p className="text-sm text-gray-500">
             Created: {new Date(course.createdAt).toLocaleDateString()}
