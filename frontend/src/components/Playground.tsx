@@ -1,60 +1,13 @@
 import { useState, useEffect } from 'react';
 import './Playground.css';
 
-// Predefined code examples
-const examples: Record<string, { code: string; wasm: string }> = {
-  hello: {
-    code: `package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello, World!")
-}`,
-    wasm: '/hello.wasm'
-  },
-  fibonacci: {
-    code: `package main
-
-import "fmt"
-
-func fibonacci(n int) int {
-    if n <= 1 {
-        return n
-    }
-    return fibonacci(n-1) + fibonacci(n-2)
-}
-
-func main() {
-    for i := 0; i < 10; i++ {
-        fmt.Printf("fibonacci(%d) = %d\\n", i, fibonacci(i))
-    }
-}`,
-    wasm: '/fibonacci.wasm'
-  },
-  loop: {
-    code: `package main
-
-import "fmt"
-
-func main() {
-    for i := 1; i <= 5; i++ {
-        fmt.Printf("Count: %d\\n", i)
-    }
-    fmt.Println("Done!")
-}`,
-    wasm: '/loop.wasm'
-  }
-};
-
 interface PlaygroundProps {
   initialCode?: string;
-  onOutput?: (output: string) => void;  // 输出回调
+  onOutput?: (output: string) => void;
 }
 
 export function Playground({ initialCode, onOutput }: PlaygroundProps) {
-  const [selectedExample, setSelectedExample] = useState('hello');
-  const [code, setCode] = useState(initialCode || examples.hello.code);
+  const [code, setCode] = useState(initialCode || '');
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState('');
@@ -66,63 +19,42 @@ export function Playground({ initialCode, onOutput }: PlaygroundProps) {
     }
   }, [initialCode]);
 
-  const handleExampleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const example = e.target.value;
-    setSelectedExample(example);
-    setCode(examples[example].code);
-    setOutput('');
-    setError('');
-  };
-
   const runCode = async () => {
+    if (!code.trim()) {
+      setError('请输入代码');
+      return;
+    }
+
     setIsRunning(true);
     setOutput('');
     setError('');
 
     try {
-      // Load the WASM file
-      const wasmPath = examples[selectedExample].wasm;
-      const response = await fetch(wasmPath);
-
-      if (!response.ok) {
-        throw new Error(`Failed to load WASM file: ${response.statusText}`);
-      }
-
-      const wasmBytes = await response.arrayBuffer();
-
-      // Check if Go is available
-      if (!(window as any).Go) {
-        throw new Error('Go WASM runtime not loaded. Please refresh the page.');
-      }
-
-      const Go = (window as any).Go;
-
-      // Create a new Go instance
-      const stdoutLines: string[] = [];
-      const go = new Go({
-        stdout: (data: string) => {
-          stdoutLines.push(data);
-          const fullOutput = stdoutLines.join('');
-          setOutput(fullOutput);
-          // 回调通知父组件
-          if (onOutput) {
-            onOutput(fullOutput);
-          }
+      const response = await fetch('https://golearn-api.backfire-ghw.workers.dev/api/compile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        stderr: (data: string) => {
-          stdoutLines.push(data);
-          const fullOutput = stdoutLines.join('');
-          setOutput(fullOutput);
-          if (onOutput) {
-            onOutput(fullOutput);
-          }
-        }
+        body: JSON.stringify({ code }),
       });
 
-      // Instantiate and run the WASM
-      const { instance } = await WebAssembly.instantiate(wasmBytes, go.importObject);
-      go.run(instance);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
 
+      const result = await response.json();
+
+      if (result.error) {
+        setError(result.error);
+        if (onOutput) {
+          onOutput('ERROR: ' + result.error);
+        }
+      } else {
+        setOutput(result.output);
+        if (onOutput) {
+          onOutput(result.output);
+        }
+      }
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       setError(errorMsg);
@@ -134,19 +66,27 @@ export function Playground({ initialCode, onOutput }: PlaygroundProps) {
     }
   };
 
+  const clearOutput = () => {
+    setOutput('');
+    setError('');
+    if (onOutput) {
+      onOutput('');
+    }
+  };
+
   return (
     <div className="playground">
       <div className="playground-header">
         <h3 className="playground-title">Go Playground</h3>
-        <select
-          className="example-select"
-          value={selectedExample}
-          onChange={handleExampleChange}
-        >
-          <option value="hello">Hello World</option>
-          <option value="fibonacci">Fibonacci</option>
-          <option value="loop">Loop</option>
-        </select>
+        <div className="playground-actions">
+          <button
+            className="clear-button"
+            onClick={clearOutput}
+            disabled={!output && !error}
+          >
+            清空输出
+          </button>
+        </div>
       </div>
 
       <textarea
@@ -154,6 +94,7 @@ export function Playground({ initialCode, onOutput }: PlaygroundProps) {
         value={code}
         onChange={(e) => setCode(e.target.value)}
         spellCheck={false}
+        placeholder="在此输入 Go 代码..."
       />
 
       <div className="playground-controls">
@@ -165,7 +106,7 @@ export function Playground({ initialCode, onOutput }: PlaygroundProps) {
           {isRunning ? (
             <>
               <div className="spinner" />
-              Running...
+              编译运行中...
             </>
           ) : (
             '▶ 运行'
@@ -177,7 +118,7 @@ export function Playground({ initialCode, onOutput }: PlaygroundProps) {
         <div>
           <div className="output-label">输出:</div>
           <div className="playground-output">
-            {error ? <span className="error">{error}</span> : output}
+            {error ? <span className="error">{error}</span> : <pre>{output}</pre>}
           </div>
         </div>
       )}

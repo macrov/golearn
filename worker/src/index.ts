@@ -27,6 +27,45 @@ interface Lesson {
   order: number;
 }
 
+// 调用 Go Playground API 编译执行代码
+async function compileAndRun(code: string): Promise<{ output: string; error: string | null }> {
+  try {
+    // Go Playground API
+    const response = await fetch('https://play.golang.org/compile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: `body=${encodeURIComponent(code)}&version=2`,
+    });
+
+    if (!response.ok) {
+      return { output: '', error: `HTTP ${response.status}: ${response.statusText}` };
+    }
+
+    const result = await response.json();
+    
+    // 解析结果
+    if (result.Errors) {
+      return { output: '', error: result.Errors };
+    }
+
+    // 提取输出
+    let output = '';
+    if (result.Events) {
+      for (const event of result.Events) {
+        if (event.Message) {
+          output += event.Message;
+        }
+      }
+    }
+
+    return { output, error: null };
+  } catch (err) {
+    return { output: '', error: String(err) };
+  }
+}
+
 async function handleRequest(request: Request, env: Env): Promise<Response> {
   console.log('Received request:', request.method, request.url);
   
@@ -46,6 +85,22 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
   }
 
   try {
+    // POST /api/compile - 编译执行代码
+    if (path === '/api/compile' && request.method === 'POST') {
+      const body = await request.json<{ code: string }>();
+      const { code } = body;
+      
+      if (!code) {
+        return Response.json({ error: 'Code is required' }, { status: 400, headers: corsHeaders });
+      }
+
+      console.log('Compiling code...');
+      const result = await compileAndRun(code);
+      console.log('Compile result:', result);
+
+      return Response.json(result, { headers: corsHeaders });
+    }
+
     // GET /api/courses
     if (path === '/api/courses' && request.method === 'GET') {
       console.log('Fetching courses from D1...');
