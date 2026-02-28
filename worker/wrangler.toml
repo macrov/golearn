@@ -1,0 +1,8 @@
+name = "golearn-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "golearn-db"
+database_id = "2ec3bb7f-408b-4564-94d7-5fef6f87fc5b"
