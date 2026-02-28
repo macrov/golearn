@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 )
@@ -21,7 +22,11 @@ func main() {
 	// Wrap with CORS middleware
 	handler := corsMiddleware(mux)
 
-	addr := ":8081"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+	addr := ":" + port
 	log.Printf("Server starting on %s", addr)
 	if err := http.ListenAndServe(addr, handler); err != nil {
 		log.Fatal(err)
