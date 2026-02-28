@@ -20,6 +20,7 @@ export function Course() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lessonLoading, setLessonLoading] = useState(false);
+  const [userOutput, setUserOutput] = useState<string>('');  // 用户运行代码的输出
 
   // Fetch course details on mount
   useEffect(() => {
@@ -53,6 +54,7 @@ export function Course() {
     const fetchLesson = async () => {
       try {
         setLessonLoading(true);
+        setUserOutput('');  // 切换课时清空输出
         const lessonData = await coursesApi.getLesson(courseId, lessonId);
         setCurrentLesson(lessonData);
       } catch (err) {
@@ -101,7 +103,7 @@ export function Course() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <div className="text-gray-600">Loading course...</div>
+        <div className="text-gray-600">加载课程中...</div>
       </div>
     );
   }
@@ -111,9 +113,9 @@ export function Course() {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
-          <div className="text-red-500 text-lg mb-4">Error: {error}</div>
+          <div className="text-red-500 text-lg mb-4">错误: {error}</div>
           <Link to="/" className="text-blue-500 hover:underline">
-            Back to Courses
+            返回课程列表
           </Link>
         </div>
       </div>
@@ -125,9 +127,9 @@ export function Course() {
     return (
       <div className="flex justify-center items-center h-screen">
         <div className="text-center">
-          <div className="text-gray-600 text-lg mb-4">Course not found</div>
+          <div className="text-gray-600 text-lg mb-4">课程未找到</div>
           <Link to="/" className="text-blue-500 hover:underline">
-            Back to Courses
+            返回课程列表
           </Link>
         </div>
       </div>
@@ -139,11 +141,11 @@ export function Course() {
     return (
       <div className="container mx-auto px-4 py-8">
         <Link to="/" className="text-blue-500 hover:underline mb-6 inline-block">
-          ← Back to Courses
+          ← 返回课程列表
         </Link>
         <div className="bg-white rounded-lg shadow-md p-8 text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">{course.title}</h1>
-          <p className="text-gray-600">This course has no lessons yet.</p>
+          <p className="text-gray-600">这个课程还没有课时。</p>
         </div>
       </div>
     );
@@ -163,7 +165,7 @@ export function Course() {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b border-gray-200 px-6 py-4 flex items-center gap-4">
           <Link to="/" className="text-blue-500 hover:underline">
-            ← Back to Courses
+            ← 返回课程列表
           </Link>
           <span className="text-gray-300">|</span>
           <h1 className="text-xl font-semibold text-gray-900">{course.title}</h1>
@@ -172,7 +174,7 @@ export function Course() {
         <div className="flex-1 flex overflow-hidden">
           {lessonLoading ? (
             <div className="flex-1 flex items-center justify-center">
-              <div className="text-gray-600">Loading lesson...</div>
+              <div className="text-gray-600">加载课时中...</div>
             </div>
           ) : currentLesson ? (
             <LessonContent
@@ -181,20 +183,24 @@ export function Course() {
               hasNext={hasNext}
               onPrevious={handlePrevious}
               onNext={handleNext}
+              userOutput={userOutput}
             />
           ) : (
             <div className="flex-1 flex items-center justify-center">
-              <div className="text-red-500">Failed to load lesson content</div>
+              <div className="text-red-500">无法加载课时内容</div>
             </div>
           )}
 
           {sidebarOpen && (
             <aside className="w-96 bg-white border-l border-gray-200 flex flex-col">
               <div className="p-4 border-b border-gray-200">
-                <h2 className="font-semibold text-gray-800">Playground</h2>
+                <h2 className="font-semibold text-gray-800">代码练习</h2>
               </div>
               <div className="flex-1 overflow-hidden">
-                <Playground initialCode={currentLesson?.code} />
+                <Playground 
+                  initialCode={currentLesson?.code}
+                  onOutput={setUserOutput}
+                />
               </div>
             </aside>
           )}

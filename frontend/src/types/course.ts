@@ -22,10 +22,6 @@ export interface Lesson {
   order: number;
   content: string;
   code: string;
-  test_cases: TestCase[];
-}
-
-export interface TestCase {
-  input: string;
-  expected_output: string;
+  hints: string[];  // 提示数组
+  expected_output: string;  // 预期输出
 }

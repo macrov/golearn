@@ -19,10 +19,11 @@ interface Lesson {
   id: string;
   course_id: string;
   title: string;
+  description: string | null;
   content: string;
   code: string;
   hints: string | null;
-  expected_output: string;
+  expected_output: string | null;
   order: number;
 }
 
@@ -66,7 +67,7 @@ async function handleRequest(request: Request, env: Env): Promise<Response> {
         return Response.json({ error: 'Course not found' }, { status: 404, headers: corsHeaders });
       }
 
-      const lessons = await env.DB.prepare('SELECT * FROM lessons WHERE course_id = ? ORDER BY "order"')
+      const lessons = await env.DB.prepare('SELECT id, title, description, "order" FROM lessons WHERE course_id = ? ORDER BY "order"')
         .bind(courseId)
         .all<Lesson>();
 

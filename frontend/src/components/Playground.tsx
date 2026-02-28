@@ -49,9 +49,10 @@ func main() {
 
 interface PlaygroundProps {
   initialCode?: string;
+  onOutput?: (output: string) => void;  // 输出回调
 }
 
-export function Playground({ initialCode }: PlaygroundProps) {
+export function Playground({ initialCode, onOutput }: PlaygroundProps) {
   const [selectedExample, setSelectedExample] = useState('hello');
   const [code, setCode] = useState(initialCode || examples.hello.code);
   const [output, setOutput] = useState('');
@@ -101,11 +102,20 @@ export function Playground({ initialCode }: PlaygroundProps) {
       const go = new Go({
         stdout: (data: string) => {
           stdoutLines.push(data);
-          setOutput(stdoutLines.join(''));
+          const fullOutput = stdoutLines.join('');
+          setOutput(fullOutput);
+          // 回调通知父组件
+          if (onOutput) {
+            onOutput(fullOutput);
+          }
         },
         stderr: (data: string) => {
           stdoutLines.push(data);
-          setOutput(stdoutLines.join(''));
+          const fullOutput = stdoutLines.join('');
+          setOutput(fullOutput);
+          if (onOutput) {
+            onOutput(fullOutput);
+          }
         }
       });
 
@@ -114,7 +124,11 @@ export function Playground({ initialCode }: PlaygroundProps) {
       go.run(instance);
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : String(err));
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      setError(errorMsg);
+      if (onOutput) {
+        onOutput('ERROR: ' + errorMsg);
+      }
     } finally {
       setIsRunning(false);
     }
@@ -154,14 +168,14 @@ export function Playground({ initialCode }: PlaygroundProps) {
               Running...
             </>
           ) : (
-            'Run'
+            '▶ 运行'
           )}
         </button>
       </div>
 
       {(output || error) && (
         <div>
-          <div className="output-label">Output:</div>
+          <div className="output-label">输出:</div>
           <div className="playground-output">
             {error ? <span className="error">{error}</span> : output}
           </div>
